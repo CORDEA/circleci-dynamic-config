@@ -1,0 +1,19 @@
+version: 2.1
+
+parameters:
+  runnable:
+    type: boolean
+    default: false
+
+jobs:
+  build:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+
+workflows:
+  build:
+    when: << pipeline.parameters.runnable >>
+    jobs:
+      - build
