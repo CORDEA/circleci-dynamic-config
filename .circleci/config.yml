@@ -10,9 +10,22 @@ jobs:
     executor: continuation/default
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - v1-sha1-cache-
       - run:
           command: |
+            readonly path="/home/circleci/.sha1_cache"
+            readonly file="$path/$CIRCLE_BRANCH"
+            if [ ! -d $path ]; then
+              mkdir $path
+            fi
+            echo $CIRCLE_SHA1 > $file
             echo "{\"runnable\": true}" > parameters.json
+      - save_cache:
+          key: v1-sha1-cache-{{ epoch }}
+          paths:
+            - /home/circleci/.sha1_cache
       - continuation/continue:
           configuration_path: ./.circleci/configs/build.yml
           parameters: ./parameters.json
