@@ -17,11 +17,19 @@ jobs:
           command: |
             readonly path="/home/circleci/.sha1_cache"
             readonly file="$path/$CIRCLE_BRANCH"
+            sha1=""
+            if [ -f $file ]; then
+              sha1=$(head -n 1 $file)
+            fi
             if [ ! -d $path ]; then
               mkdir $path
             fi
+            if [ $sha1 = $CIRCLE_SHA1 ]; then
+              echo "{\"runnable\": false}" > parameters.json
+            else
+              echo "{\"runnable\": true}" > parameters.json
+            fi
             echo $CIRCLE_SHA1 > $file
-            echo "{\"runnable\": true}" > parameters.json
       - save_cache:
           key: v1-sha1-cache-{{ epoch }}
           paths:
